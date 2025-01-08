@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-testbatch_mobilenetv1.py
-Classify all images in a folder
+test_batch_googlenet.py
+Run GoogLeNet classification on all images in a folder
 
 Adapted from DF Robot RDK X3 documentation
-@sa https://d-robotics.github.io/
+@sa https://colab.research.google.com/github/d2l-ai/d2l-pytorch-colab/blob/master/chapter_convolutional-modern/googlenet.ipynb
 """
 import argparse
 from hobot_dnn import pyeasy_dnn as dnn
@@ -134,12 +134,13 @@ def iterate_images(folder_path):
         if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp')):
             yield os.path.join(folder_path, filename)
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Test MobileNetv1 model classification")
     parser.add_argument("folder_path", type=str, help="Path to the folder of image files to be classified",
-                        default="/home/sunrise/PycharmProjects/d-robotics/images")
-    parser.add_argument("model_file", type=str, help="Path to the model file, i.e. MobileNetv1",
-                        default="/app/pydev_demo/models/mobilenetv1_224x224_nv12.bin")
+                        default="/home/sunrise/PycharmProjects/d-robotics/images/zebra_cls.jpg")
+    parser.add_argument("model_file", type=str, help="Path to the model file, i.e. GoogLeNet",
+                        default="/app/pydev_demo/models/googlenet_224x224_nv12.bin")
     args = parser.parse_args()
     # test image
     folder_path = args.folder_path
@@ -148,8 +149,11 @@ if __name__ == '__main__':
         print(f"Model file {mdl_test} not found")
         exit(-1)
     # test classification result
+    mdl_test = args.model_file
     for img_test in iterate_images(folder_path):
-        models = dnn.load(mdl_test)
+        print(f"Processing {img_test}...")
+        # test classification result
+        models = dnn.load('/app/pydev_demo/models/googlenet_224x224_nv12.bin')
         # test input and output properties
         print("=" * 10, "inputs[0] properties", "=" * 10)
         print_properties(models[0].inputs[0].properties)
@@ -160,6 +164,7 @@ if __name__ == '__main__':
         print("outputs[0] name is:", models[0].outputs[0].name)
 
 
+        # img_file = cv2.imread('../images/zebra_cls.jpg')
         img_file = cv2.imread(img_test)
         h, w = get_hw(models[0].inputs[0].properties)
         des_dim = (w, h)
@@ -178,14 +183,14 @@ if __name__ == '__main__':
         classification_postprocess_info.ori_width = org_width
         classification_postprocess_info.score_threshold = 0.3
         classification_postprocess_info.nms_threshold = 0
-        classification_postprocess_info.nms_top_k = 500
+        classification_postprocess_info.nms_top_k = 1
         classification_postprocess_info.is_pad_resize = 0
 
         output_tensors = (hbDNNTensor_t * len(models[0].outputs))()
         for i in range(len(models[0].outputs)):
             output_tensors[i].properties.tensorLayout = get_TensorLayout(outputs[i].properties.layout)
             # print(output_tensors[i].properties.tensorLayout)
-            if len(outputs[i].properties.scale_data) == 0:
+            if (len(outputs[i].properties.scale_data) == 0):
                 output_tensors[i].properties.quantiType = 0
                 output_tensors[i].sysMem[0].virAddr = ctypes.cast(outputs[i].buffer.ctypes.data_as(ctypes.POINTER(ctypes.c_float)), ctypes.c_void_p)
             else:
@@ -202,7 +207,7 @@ if __name__ == '__main__':
         result_str = get_Postprocess_result(ctypes.pointer(classification_postprocess_info))
         result_str = result_str.decode('utf-8')
         t1 = time.time()
-        print("postprocessing time is :", (t1 - t0))
+        print("postprocess time is :", (t1 - t0))
 
         # draw result
         # 解析JSON字符串
@@ -216,3 +221,5 @@ if __name__ == '__main__':
 
             # 打印信息
             print(f"cls id: {label}, Confidence: {prob}, class_name: {name}")
+
+        print(f"What do you think of the classification?")
