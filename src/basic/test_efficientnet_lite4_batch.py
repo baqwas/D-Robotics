@@ -1,17 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-test_batch_googlenet.py
-Run GoogLeNet classification on all images in a folder
+test_efficientnet_lite4_batch.py
+Classify all image files in a folder using EfficientNet Lite 4 model
+
+This file is part of d-robotics repository at https://github.com/baqwas/d-robotics
+It is free software: you can redistribute it and/or modify it under the terms of
+the GNU General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+This file is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with Foobar. If not,
+see <https://www.gnu.org/licenses/>.
+
+(C) 2024 ParkCircus Productions; All Rights Reserved
 
 Adapted from DF Robot RDK X3 documentation
 @sa https://colab.research.google.com/github/d2l-ai/d2l-pytorch-colab/blob/master/chapter_convolutional-modern/googlenet.ipynb
 """
-import argparse
 from hobot_dnn import pyeasy_dnn as dnn
 import numpy as np
 import cv2
 
+import argparse
 import time
 import ctypes
 import json
@@ -134,13 +147,12 @@ def iterate_images(folder_path):
         if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp')):
             yield os.path.join(folder_path, filename)
 
-
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Test MobileNetv1 model classification")
-    parser.add_argument("folder_path", type=str, help="Path to the folder of image files to be classified",
-                        default="/home/sunrise/PycharmProjects/d-robotics/images/zebra_cls.jpg")
-    parser.add_argument("model_file", type=str, help="Path to the model file, i.e. GoogLeNet",
-                        default="/app/pydev_demo/models/googlenet_224x224_nv12.bin")
+    parser = argparse.ArgumentParser(description="Test EfficientNet Lite 4 model classification")
+    parser.add_argument("folder_path", type=str, help="Path to the folder of the images to be classified",
+                        default="/home/sunrise/PycharmProjects/d-robotics/images")
+    parser.add_argument("model_file", type=str, help="Path to the model file, i.e. EfficientNet Lite4",
+                        default="/app/pydev_demo/models/efficientnet_lite4_300x300_nv12.bin")
     args = parser.parse_args()
     # test image
     folder_path = args.folder_path
@@ -148,12 +160,12 @@ if __name__ == '__main__':
     if not file_exists(mdl_test):
         print(f"Model file {mdl_test} not found")
         exit(-1)
+
     # test classification result
-    mdl_test = args.model_file
+    models = dnn.load(mdl_test)
+
     for img_test in iterate_images(folder_path):
         print(f"Processing {img_test}...")
-        # test classification result
-        models = dnn.load('/app/pydev_demo/models/googlenet_224x224_nv12.bin')
         # test input and output properties
         print("=" * 10, "inputs[0] properties", "=" * 10)
         print_properties(models[0].inputs[0].properties)
@@ -164,7 +176,7 @@ if __name__ == '__main__':
         print("outputs[0] name is:", models[0].outputs[0].name)
 
 
-        # img_file = cv2.imread('../images/zebra_cls.jpg')
+        # img_file = cv2.imread('./zebra_cls.jpg')
         img_file = cv2.imread(img_test)
         h, w = get_hw(models[0].inputs[0].properties)
         des_dim = (w, h)
@@ -183,7 +195,7 @@ if __name__ == '__main__':
         classification_postprocess_info.ori_width = org_width
         classification_postprocess_info.score_threshold = 0.3
         classification_postprocess_info.nms_threshold = 0
-        classification_postprocess_info.nms_top_k = 1
+        classification_postprocess_info.nms_top_k = 500
         classification_postprocess_info.is_pad_resize = 0
 
         output_tensors = (hbDNNTensor_t * len(models[0].outputs))()
@@ -222,4 +234,4 @@ if __name__ == '__main__':
             # 打印信息
             print(f"cls id: {label}, Confidence: {prob}, class_name: {name}")
 
-        print(f"What do you think of the classification?")
+        print(f"How good was the classification?")
