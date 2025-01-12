@@ -47,10 +47,7 @@ def image_read_write(file_name):
         'DIVX': Another popular codec for AVI files
         'MP4V': For MP4 files
         'H264': A modern and efficient codec, often used for high-quality video
-
     """
-    # fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-    # codec = cv2.VideoWriter('output.mp4', fourcc, 30.0, (1920, 1080))
     codec = cv2.VideoWriter_fourcc( 'M', 'J', 'P', 'G' )
     cap.set(cv2.CAP_PROP_FOURCC, codec)
     cap.set(cv2.CAP_PROP_FPS, 30)
@@ -59,12 +56,11 @@ def image_read_write(file_name):
 
     _ ,frame = cap.read()
 
-    # print(frame.shape)
+    if frame is not None:
+        cv2.imwrite(file_name, frame)
+    else:
+        print("Failed to retrieve frame from USB camera")
 
-    if frame is None:
-        print("Failed to get image from usb camera")
-
-    cv2.imwrite(file_name, frame)
     return
 
 if __name__ == '__main__':
