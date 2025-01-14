@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-test_efficientnasnet_m.py
-Use EfficientNet-m to classify an image
+image_read_write.py
+Use OpenCV to read and write  an image
 
 This file is part of d-robotics repository at https://github.com/baqwas/d-robotics
 It is free software: you can redistribute it and/or modify it under the terms of
@@ -17,11 +17,12 @@ see <https://www.gnu.org/licenses/>.
 
 (C) 2024 ParkCircus Productions; All Rights Reserved
 
-Efficient-NASNet-M focuses on efficiency and accuracy through:
-- Efficient-NASNet-M leverages EfficientNet scaling moethod. (depth, width & resolution)
-- NASNet architecture
-- Improved resource usage
-- Better performance without compromising accuracy
+    Common FourCC codes:
+        'XVID': A widely supported codec for AVI files
+        'MJPG': Motion JPEG codec, often used for higher quality output
+        'DIVX': Another popular codec for AVI files
+        'MP4V': For MP4 files
+        'H264': A modern and efficient codec, often used for high-quality video
 
 Adapted from DF Robot RDK X3 documentation
 @sa https://arxiv.org/pdf/1905.11946
@@ -40,14 +41,6 @@ def image_read_write(file_name):
     else:
         exit(-1)
 
-    """
-    Common FourCC codes:
-        'XVID': A widely supported codec for AVI files
-        'MJPG': Motion JPEG codec, often used for higher quality output
-        'DIVX': Another popular codec for AVI files
-        'MP4V': For MP4 files
-        'H264': A modern and efficient codec, often used for high-quality video
-    """
     codec = cv2.VideoWriter_fourcc( 'M', 'J', 'P', 'G' )
     cap.set(cv2.CAP_PROP_FOURCC, codec)
     cap.set(cv2.CAP_PROP_FPS, 30)
