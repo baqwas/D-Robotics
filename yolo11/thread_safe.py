@@ -20,6 +20,18 @@ see <https://www.gnu.org/licenses/>.
 Adapted from DF Robot RDK X3 documentation
 @sa https://colab.research.google.com/github/d2l-ai/d2l-pytorch-colab/blob/master/chapter_convolutional-modern/googlenet.ipynb
 """
+from threading import Thread
+
 from ultralytics import YOLO
-model = YOLO("yolo11n.pt")
-results = model("../images/tram_houston.jpg")
+
+
+def thread_safe_predict(model, image_path):
+    """Performs thread-safe prediction on an image using a locally instantiated YOLO model."""
+    model = YOLO(model)
+    results = model.predict(image_path)
+    # Process results
+
+
+# Starting threads that each have their own model instance
+Thread(target=thread_safe_predict, args=("yolo11n.pt", "../images/tram_dallas.jpg")).start()
+Thread(target=thread_safe_predict, args=("yolo11n.pt", "../images/tram_houston.jpg")).start()

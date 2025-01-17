@@ -20,6 +20,24 @@ see <https://www.gnu.org/licenses/>.
 Adapted from DF Robot RDK X3 documentation
 @sa https://colab.research.google.com/github/d2l-ai/d2l-pytorch-colab/blob/master/chapter_convolutional-modern/googlenet.ipynb
 """
+from PIL import Image
+
 from ultralytics import YOLO
+
+# Load a pretrained YOLO11n model
 model = YOLO("yolo11n.pt")
-results = model("../images/tram_houston.jpg")
+
+# Run inference on 'bus.jpg'
+results = model(["../images/tram_dallas.jpg", "../images/tram_houston.jpg"])  # results list
+
+# Visualize the results
+for i, r in enumerate(results):
+    # Plot results image
+    im_bgr = r.plot()  # BGR-order numpy array
+    im_rgb = Image.fromarray(im_bgr[..., ::-1])  # RGB-order PIL image
+
+    # Show results to screen (in supported environments)
+    r.show()
+
+    # Save results to disk
+    r.save(filename=f"results{i}.jpg")

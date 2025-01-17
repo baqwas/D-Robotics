@@ -21,5 +21,13 @@ Adapted from DF Robot RDK X3 documentation
 @sa https://colab.research.google.com/github/d2l-ai/d2l-pytorch-colab/blob/master/chapter_convolutional-modern/googlenet.ipynb
 """
 from ultralytics import YOLO
-model = YOLO("yolo11n.pt")
-results = model("../images/tram_houston.jpg")
+
+# Load a pretrained YOLO11n-pose Pose model
+model = YOLO("yolo11n-pose.pt")
+
+# Run inference on an image
+results = model("../images/tram_houston.jpg")  # results list
+
+# View results
+for r in results:
+    print(r.keypoints)  # print the Keypoints object containing the detected keypoints

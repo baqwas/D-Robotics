@@ -21,5 +21,13 @@ Adapted from DF Robot RDK X3 documentation
 @sa https://colab.research.google.com/github/d2l-ai/d2l-pytorch-colab/blob/master/chapter_convolutional-modern/googlenet.ipynb
 """
 from ultralytics import YOLO
+
+# Load a pretrained YOLO11n model
 model = YOLO("yolo11n.pt")
-results = model("../images/tram_houston.jpg")
+
+# Run inference on an image
+results = model("../images/tram_houston.jpg")  # results list
+
+# View results
+for r in results:
+    print(r.boxes)  # print the Boxes object containing the detection bounding boxes
